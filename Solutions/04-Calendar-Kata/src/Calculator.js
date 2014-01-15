@@ -1,6 +1,6 @@
 (function (Namespace) {
     'use strict';
-    var Calendar;
+    var Calculator;
 
     function checkNumberType( aArguments ) {
         var nIndex,
@@ -28,9 +28,20 @@
             throw new Error( 'You should supply only numbers.' );
         }
     }
-
-    Calendar = {
-        add: function ( nValue1, nValue2 ) {
+    
+    function getMethodByType( sType ) {
+        var oTypes = {
+            "add": function ( nNumber, nSubtotal ) {
+                return nSubtotal + nNumber;
+            },
+            "substract": function ( nNumber, nSubtotal ) {
+                return nSubtotal - nNumber;
+            },
+            "multiply": function ( nNumber, nSubtotal ) {
+                return nSubtotal * nNumber;
+            }
+        };
+        return function ( nValue1, nValue2 ) {
             var nIndex,
                 aArgs = sanitizeAndValidate( arguments ),
                 nLenArgs = aArgs.length,
@@ -39,37 +50,17 @@
             nTotal = nValue1 || 0;
 
             for ( nIndex = 1; nIndex < nLenArgs; nIndex++ ) {
-                nTotal += aArgs[nIndex];
+                nTotal = oTypes[sType]( aArgs[nIndex], nTotal );
             }
             return nTotal;
-        },
-        substract: function ( nValue1, nValue2 ) {
-            var nIndex,
-                aArgs = sanitizeAndValidate( arguments ),
-                nLenArgs = aArgs.length,
-                nTotal;
+        };
+    }
 
-            nTotal = nValue1 || 0;
-
-            for ( nIndex = 1; nIndex < nLenArgs; nIndex++ ) {
-                nTotal -= aArgs[nIndex];
-            }
-            return nTotal;
-        },
-        multiply: function ( nValue1, nValue2 ) {
-            var nIndex,
-                aArgs = sanitizeAndValidate( arguments ),
-                nLenArgs = aArgs.length,
-                nTotal;
-
-            nTotal = nValue1 || 0;
-
-            for ( nIndex = 1; nIndex < nLenArgs; nIndex++ ) {
-                nTotal *=  aArgs[nIndex];
-            }
-            return nTotal;
-        }
+    Calculator = {
+        add: getMethodByType( 'add' ),
+        substract: getMethodByType( 'substract' ),
+        multiply: getMethodByType( 'multiply' )
     };
 
-    Namespace.Calendar = Calendar;
+    Namespace.Calculator = Calculator;
 }((window.Namespace = window.Namespace || {})));
