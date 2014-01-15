@@ -27,21 +27,22 @@
         if ( !checkNumberType( aArgs ) ) {
             throw new Error( 'You should supply only numbers.' );
         }
+        return aArgs;
     }
-    
-    function getMethodByType( sType ) {
-        var oTypes = {
-            "add": function ( nNumber, nSubtotal ) {
-                return nSubtotal + nNumber;
+
+    function factory( sType ){
+        var oDecorators = {
+            'add': function ( nTotal, nValue){
+                return nTotal + nValue;
             },
-            "substract": function ( nNumber, nSubtotal ) {
-                return nSubtotal - nNumber;
+            'substract': function ( nTotal, nValue ) {
+                return nTotal - nValue;
             },
-            "multiply": function ( nNumber, nSubtotal ) {
-                return nSubtotal * nNumber;
+            'multiply': function ( nTotal, nValue ) {
+                return nTotal * nValue;
             }
         };
-        return function ( nValue1, nValue2 ) {
+        return function ( nValue1, nValue2 ){
             var nIndex,
                 aArgs = sanitizeAndValidate( arguments ),
                 nLenArgs = aArgs.length,
@@ -50,16 +51,16 @@
             nTotal = nValue1 || 0;
 
             for ( nIndex = 1; nIndex < nLenArgs; nIndex++ ) {
-                nTotal = oTypes[sType]( aArgs[nIndex], nTotal );
+                nTotal = oDecorators[sType]( nTotal, aArgs[nIndex] );
             }
             return nTotal;
         };
     }
 
     Calculator = {
-        add: getMethodByType( 'add' ),
-        substract: getMethodByType( 'substract' ),
-        multiply: getMethodByType( 'multiply' )
+        add: factory( 'add' ),
+        substract: factory( 'substract' ),
+        multiply: factory( 'multiply' )
     };
 
     Namespace.Calculator = Calculator;
